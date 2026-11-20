@@ -1,0 +1,494 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>香港薪俸税计算器 2026/27</title>
+<style>
+  :root{
+    --ink:#111;            /* 主色:墨黑 */
+    --paper:#fff;
+    --tint:#f5f5f3;        /* 浅灰底 */
+    --line:#dcdcd8;
+    --muted:#757575;
+    --serif:"Bodoni 72","Didot","Playfair Display","Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--paper);color:var(--ink);line-height:1.55;padding-bottom:90px;font-family:var(--sans)}
+
+  /* ===== 页头(杂志刊头) ===== */
+  header{border-bottom:1px solid var(--ink);padding:18px 20px 26px;text-align:center}
+  .hd{max-width:1000px;margin:0 auto}
+  .kicker{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+          color:var(--muted);padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:26px}
+  header h1{margin:0;font-family:var(--serif);font-weight:700;font-size:clamp(34px,8.5vw,68px);line-height:1.1;letter-spacing:.04em}
+  header h1 em{display:block;font-style:italic;font-weight:400;font-size:.62em;letter-spacing:.12em;margin-top:6px}
+  header p{margin:16px 0 0;font-size:12px;letter-spacing:.14em;color:var(--muted)}
+
+  /* ===== 布局 ===== */
+  .wrap{max-width:1000px;margin:32px auto 0;padding:0 16px;display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:start}
+  .card{border-top:2px solid var(--ink);padding:14px 0 6px;margin-bottom:30px}
+  .card h2{margin:0 0 18px;font-family:var(--serif);font-size:22px;font-weight:700;display:flex;align-items:baseline;gap:12px}
+  .card h2 .n{font-family:var(--serif);font-style:italic;font-weight:400;font-size:14px;color:var(--muted);letter-spacing:.1em}
+
+  .row{display:grid;grid-template-columns:1fr 140px;gap:12px;align-items:center;margin-bottom:16px}
+  .row.two{grid-template-columns:1fr 80px 80px}
+  .row.stack{grid-template-columns:1fr;gap:8px}
+  .row.wide{grid-template-columns:1fr 1fr}
+  .row.wide label{grid-column:1/-1}
+  .row label{font-size:14px}
+  .row small,.hint{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:2px}
+  .colhead{display:grid;grid-template-columns:1fr 80px 80px;gap:12px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  .colhead span{text-align:center}
+  .sub{margin-top:18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding-top:14px;border-top:1px solid var(--line)}
+  input[type=number],select{width:100%;padding:9px 10px;border:1px solid #bdbdb8;border-radius:0;font-size:15px;background:#fff;color:var(--ink);font-family:var(--sans);-webkit-appearance:none;appearance:none}
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);
+         background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+  input:focus,select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  input:disabled,select:disabled{background:var(--tint);color:#a8a8a4;border-color:var(--line)}
+  .inline{display:grid;grid-template-columns:104px 1fr;gap:8px}
+  .check{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:12px;line-height:1.45}
+  .check input{width:18px;height:18px;margin-top:1px;flex:none;accent-color:var(--ink)}
+
+  details{border-top:1px solid var(--ink);padding:14px 0;margin-bottom:0}
+  details:last-of-type{border-bottom:1px solid var(--ink)}
+  details summary{cursor:pointer;list-style:none;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+                  display:flex;justify-content:space-between;align-items:center}
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{content:"+";font-size:18px;font-weight:300;letter-spacing:0}
+  details[open] summary::after{content:"−"}
+  details[open] summary{margin-bottom:16px}
+  #more{margin-bottom:30px;border-bottom:1px solid var(--ink)}
+
+  /* ===== 结果 ===== */
+  .sticky{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:2px}
+  .printhead{display:none}
+  .big{border-top:4px solid var(--ink);padding:16px 0 18px;margin-bottom:20px;border-bottom:1px solid var(--ink)}
+  .big .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .big .amt{font-family:var(--serif);font-size:clamp(46px,13vw,68px);font-weight:700;line-height:1.1;margin:8px 0 18px;letter-spacing:-.01em}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);padding-top:14px}
+  .kpis div{padding:0 12px;border-left:1px solid var(--line)}
+  .kpis div:first-child{padding-left:0;border-left:none}
+  .kpis b{display:block;font-family:var(--serif);font-size:clamp(17px,4.6vw,22px);font-weight:700}
+  .kpis span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  td,th{padding:8px 3px;border-bottom:1px solid var(--line);text-align:right}
+  td:first-child,th:first-child{text-align:left}
+  th{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--ink)}
+  tr.total td{font-weight:700;border-top:1px solid var(--ink);border-bottom:none}
+  tr.win td{background:var(--tint);font-weight:700}
+  .tag{font-family:var(--sans);font-size:10px;letter-spacing:.14em;padding:3px 9px;border:1px solid var(--ink);color:var(--ink);margin-left:6px;font-weight:600;white-space:nowrap;vertical-align:3px}
+
+  .btn{border:1px solid var(--ink);background:#fff;color:var(--ink);padding:12px 22px;border-radius:0;cursor:pointer;
+       font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-family:var(--sans);font-weight:600;margin-right:8px}
+  .btn:hover{background:var(--ink);color:#fff}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{background:#fff;color:var(--ink)}
+  .actions{margin-bottom:22px}
+
+  /* 手机底栏 */
+  .mbar{display:none;position:fixed;left:0;right:0;bottom:0;background:#fff;color:var(--ink);
+        padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+        justify-content:space-between;align-items:center;z-index:9;border-top:2px solid var(--ink);cursor:pointer}
+  .mbar small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mbar span{font-size:12px;letter-spacing:.14em}
+  .mbar b{font-family:var(--serif);font-size:26px}
+
+  /* ===== 页脚 ===== */
+  footer{max-width:1000px;margin:40px auto 24px;padding:20px 16px 0;border-top:2px solid var(--ink);font-size:12px;color:var(--muted)}
+  .links{display:flex;flex-wrap:wrap;gap:8px 28px;margin:0 0 20px}
+  .links a{color:var(--ink);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;text-decoration:none;
+           border-bottom:1px solid var(--ink);padding-bottom:2px}
+  .links a:hover{background:var(--ink);color:#fff}
+  footer p{margin:0 0 10px;line-height:1.7}
+
+  /* ===== 平板 / 手机 ===== */
+  @media(max-width:860px){
+    .wrap{grid-template-columns:1fr;gap:0}
+    .sticky{position:static;max-height:none;overflow:visible}
+    .mbar{display:flex}
+  }
+  @media(max-width:520px){
+    header{padding:14px 14px 22px}
+    .kicker{margin-bottom:20px}
+    .wrap{margin-top:24px;padding:0 14px}
+    .row{grid-template-columns:1fr 120px}
+    .row.stack{grid-template-columns:1fr}
+    .row.wide{grid-template-columns:1fr 1fr}
+    .row.two{grid-template-columns:1fr 66px 66px}
+    .colhead{grid-template-columns:1fr 66px 66px}
+    input[type=number],select{font-size:16px;padding:10px 8px;min-height:44px}
+    select{padding-right:26px}
+    .row.two input{padding:10px 4px;text-align:center}
+    .check{min-height:36px}
+    .btn{padding:14px 20px}
+    table{font-size:12px}
+    td,th{padding:8px 2px}
+    .links{flex-direction:column;gap:14px}
+    .links a{align-self:flex-start}
+  }
+
+  /* ===== 打印:只输出结果区 ===== */
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff;padding:0}
+    header,.inputs,.mbar,footer,.noprint{display:none!important}
+    .wrap{display:block;margin:0;padding:0;max-width:none}
+    .sticky{position:static;max-height:none;overflow:visible;padding:0}
+    .printhead{display:block;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--ink);text-align:center}
+    .printhead h1{margin:0;font-family:var(--serif);font-size:24px}
+    .printhead p{margin:4px 0 0;font-size:10px;letter-spacing:.14em;color:#555}
+    th,tr.win td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .card,details{break-inside:avoid}
+    .printnote{display:block!important}
+  }
+  .printnote{display:none;font-size:10.5px;color:#666;margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="kicker"><span>Hong Kong</span><span>Salaries Tax</span><span>Y/A 2026/27</span></div>
+    <h1>香港薪俸税计算器<em>2026/27</em></h1>
+    <p>依据税务局 PAM 61「免税额、扣除及税率表」</p>
+  </div>
+</header>
+
+<div class="wrap">
+<!-- ============ 输入 ============ -->
+<div class="inputs">
+  <div class="card">
+    <h2><span class="n">01</span>收入</h2>
+    <div class="row stack">
+      <label for="income">应评税入息<small>薪金、花红、津贴等(未扣强积金)</small></label>
+      <div class="inline">
+        <select id="incUnit"><option value="12">月薪</option><option value="1" selected="">全年</option></select>
+        <input type="number" id="income" min="0" step="1000" value="600000">
+      </div>
+    </div>
+    <div class="row"><label for="mpf">强积金强制性供款<small id="mpfHint">每年上限 $18,000</small></label>
+      <input type="number" id="mpf" min="0" step="100" value="0"></div>
+    <div class="check"><input type="checkbox" id="mpfAuto" checked=""><label for="mpfAuto">按入息 5% 自动估算(上限 $18,000/年)</label></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">02</span>家庭状况</h2>
+    <div class="row"><label for="marital">婚姻状况</label>
+      <select id="marital">
+        <option value="single">单身</option>
+        <option value="married">已婚</option>
+        <option value="sp">单亲</option>
+      </select></div>
+    <div class="row"><label for="kids">子女人数<small>首 9 名可获免税额</small></label>
+      <input type="number" id="kids" min="0" step="1" value="0"></div>
+    <div class="row"><label for="newKids">其中出生后两年内的子女<small>可再获一份额外子女免税额</small></label>
+      <input type="number" id="newKids" min="0" step="1" value="0"></div>
+
+    <div class="sub">供养父母 / 祖父母</div>
+    <div class="colhead" style="margin-top:12px"><span></span><span>人数</span><span>同住</span></div>
+    <div class="row two"><label>60 岁或以上<small>或已领政府长者/伤残津贴</small></label>
+      <input type="number" id="p60" min="0" step="1" value="0"><input type="number" id="p60l" min="0" step="1" value="0"></div>
+    <div class="row two"><label>55–59 岁</label>
+      <input type="number" id="p55" min="0" step="1" value="0"><input type="number" id="p55l" min="0" step="1" value="0"></div>
+    <p class="hint" style="margin:0 0 12px">同住可获额外免税额,金额与基本免税额相同。</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">03</span>常用扣除</h2>
+    <div class="row"><label for="hType">住房扣除<small>同一年度只能择一申索</small></label>
+      <select id="hType">
+        <option value="">不申索</option>
+        <option value="hli">居所贷款利息</option>
+        <option value="rent">住宅租金</option>
+      </select></div>
+    <div class="row"><label for="hAmt">全年金额</label>
+      <input type="number" id="hAmt" min="0" step="1000" value="0" disabled=""></div>
+    <div class="check"><input type="checkbox" id="hKid" disabled=""><label for="hKid">全年与 2023 年 10 月 25 日或之后出生的子女同住(上限由 $100,000 增至 $120,000)</label></div>
+    <div class="row"><label for="annuity">合资格年金保费 + 可扣税强积金自愿性供款(TVC)<small>合计上限 $60,000</small></label>
+      <input type="number" id="annuity" min="0" step="1000" value="0"></div>
+    <div class="row"><label for="donation">认可慈善捐款<small id="donHint">上限为入息的 35%</small></label>
+      <input type="number" id="donation" min="0" step="500" value="0"></div>
+  </div>
+
+  <details id="more">
+    <summary>更多项目(伤残、兄弟姊妹、进修、医保等)</summary>
+    <div class="row"><label for="expenses">可扣除支出及折旧免税额<small>未获发还的必要开支</small></label>
+      <input type="number" id="expenses" min="0" step="100" value="0"></div>
+    <div class="row"><label for="selfEdu">个人进修开支<small>上限 $100,000</small></label>
+      <input type="number" id="selfEdu" min="0" step="1000" value="0"></div>
+    <div class="row"><label for="elderly">长者住宿照顾开支<small>上限 $110,000</small></label>
+      <input type="number" id="elderly" min="0" step="1000" value="0"></div>
+    <div class="row wide"><label>自愿医保(VHIS)保费<small>每名受保人上限 $8,000;左:保费合计,右:受保人数</small></label>
+      <input type="number" id="vhis" min="0" step="100" value="0" title="全年保费合计" placeholder="保费合计">
+      <input type="number" id="vhisN" min="1" step="1" value="1" title="受保人数" placeholder="受保人数"></div>
+    <div class="row"><label for="art">辅助生育服务开支<small>上限 $100,000</small></label>
+      <input type="number" id="art" min="0" step="1000" value="0"></div>
+    <div class="row"><label for="sib">供养兄弟姊妹人数<small>每名 $37,500</small></label>
+      <input type="number" id="sib" min="0" step="1" value="0"></div>
+    <div class="row"><label for="disDep">伤残受养人人数<small>每名 $75,000</small></label>
+      <input type="number" id="disDep" min="0" step="1" value="0"></div>
+    <div class="check"><input type="checkbox" id="disSelf"><label for="disSelf">本人为伤残人士($75,000)</label></div>
+    <div class="check"><input type="checkbox" id="disSp"><label for="disSp">配偶为伤残人士($75,000,仅限已婚)</label></div>
+    <div class="row"><label for="rebate">税款宽减<small>目前未公布 2026/27 宽减,如有可手动输入</small></label>
+      <input type="number" id="rebate" min="0" step="100" value="0"></div>
+  </details>
+
+  <div class="actions noprint">
+    <button class="btn" id="reset" type="button">重置所有输入</button>
+  </div>
+</div>
+
+<!-- ============ 结果(打印时只输出这一栏) ============ -->
+<div class="sticky" id="result">
+  <div class="printhead">
+    <h1>香港薪俸税估算 · 2026/27 课税年度</h1>
+    <p>生成日期:<span id="pDate"></span> · 依据税务局 PAM 61</p>
+  </div>
+
+  <div class="big">
+    <div class="lbl">预计 2026/27 应缴税款</div>
+    <div class="amt" id="rTax">$0</div>
+    <div class="kpis">
+      <div><b id="rMonth">$0</b><span>平均每月</span></div>
+      <div><b id="rEff">0%</b><span>实际税率</span></div>
+      <div><b id="rMar">0%</b><span>边际税率</span></div>
+    </div>
+  </div>
+
+  <div class="actions noprint">
+    <button class="btn primary" id="print" type="button">打印 / 存为 PDF</button>
+  </div>
+
+  <div class="card">
+    <h2>计算过程 <span class="tag" id="method"></span></h2>
+    <table id="tCalc"></table>
+  </div>
+
+  <details>
+    <summary>免税额明细</summary><table id="tAllow"></table>
+  </details>
+  <details>
+    <summary>扣除明细</summary><table id="tDed"></table>
+  </details>
+  <details>
+    <summary>累进税率分段</summary><table id="tBand"></table>
+  </details>
+
+  <p class="printnote">本结果仅供估算,不构成税务意见,实际税款以税务局评税为准。不含物业税、利得税及夫妇分开评税比较。</p>
+</div>
+</div>
+
+<div class="mbar" id="mbar" role="button" aria-label="查看计算明细">
+  <span>预计应缴税款<small>点按查看明细 ↓</small></span><b id="mTax">$0</b>
+</div>
+
+<footer>
+  <div class="links">
+    <a href="https://www.ird.gov.hk/eng/ese/st_comp_2026_27/stc.htm" target="_blank" rel="noopener noreferrer">税务局官方计算器 ↗</a>
+    <a href="https://www.ird.gov.hk/eng/pdf/pam61e.pdf" target="_blank" rel="noopener noreferrer">PAM 61 税率表 ↗</a>
+    <a href="https://www.ird.gov.hk/" target="_blank" rel="noopener noreferrer">香港税务局 ↗</a>
+  </div>
+  <p><b>规则:</b>应课税入息实额 = 入息 − 扣除总额 − 免税总额。税款取「累进税率」与「标准税率(只扣除、不扣免税额)」两者中较低者。
+  累进税率:首 $50,000 为 2%、其次 $50,000 为 6%、再次 $50,000 为 10%、再次 $50,000 为 14%、余额 17%。
+  标准税率:首 $5,000,000 为 15%,余额 16%。</p>
+  <p>本工具仅供估算,不构成税务意见,实际税款以税务局评税为准。不含物业税、利得税及夫妇分开评税比较。</p>
+</footer>
+
+<script>
+/* ===== PAM 61:2026/27 及以后 ===== */
+const P = {
+  basic:145000, married:290000, single:145000,
+  child:140000, sibling:37500,
+  par60:55000, par55:27500,
+  dis:75000, disDep:75000,
+  selfEdu:100000, elderly:110000,
+  housing:100000, housingKid:120000,
+  rrs:18000, vhis:8000, annuity:60000, art:100000,
+  donPct:0.35, maxKids:9
+};
+const BANDS = [[50000,.02],[50000,.06],[50000,.10],[50000,.14],[Infinity,.17]];
+const STD   = [[5000000,.15],[Infinity,.16]];
+
+const $ = id => document.getElementById(id);
+const num = id => Math.max(0, parseFloat($(id).value) || 0);
+const cnt = id => Math.floor(num(id));
+const fmt = n => '$' + Math.round(n).toLocaleString('en-HK');
+const pct = n => (Math.round(n*10000)/100) + '%';
+
+function tiered(amount, tiers){
+  let left = amount, total = 0; const rows = [];
+  for(const [size,rate] of tiers){
+    if(left <= 0) break;
+    const part = Math.min(left,size), tax = part*rate;
+    rows.push({part,rate,tax}); total += tax; left -= part;
+  }
+  return {rows,total};
+}
+
+function calc(){
+  const income = num('income') * parseFloat($('incUnit').value);
+  const exp = Math.min(num('expenses'), income);
+
+  const mpfAuto = $('mpfAuto').checked;
+  $('mpf').disabled = mpfAuto;
+  if(mpfAuto) $('mpf').value = Math.round(Math.min(income*0.05, P.rrs));
+  const mpf = Math.min(num('mpf'), P.rrs);
+
+  const marital = $('marital').value;
+  $('disSp').disabled = marital !== 'married';
+  if(marital !== 'married') $('disSp').checked = false;
+
+  const hType = $('hType').value;
+  $('hAmt').disabled = !hType;
+  $('hKid').disabled = !hType;
+  if(!hType){ $('hAmt').value = 0; $('hKid').checked = false; }
+
+  /* 免税额 */
+  const A = [['基本免税额', P.basic]];
+  if(marital==='married') A.push(['已婚人士免税额', P.married]);
+  if(marital==='sp')      A.push(['单亲免税额', P.single]);
+  if($('disSelf').checked) A.push(['伤残人士免税额(本人)', P.dis]);
+  if($('disSp').checked)   A.push(['伤残人士免税额(配偶)', P.dis]);
+
+  const kids = Math.min(cnt('kids'), P.maxKids);
+  const newK = Math.min(cnt('newKids'), kids);
+  if(kids) A.push(['子女免税额 × '+kids, kids*P.child]);
+  if(newK) A.push(['新生子女额外免税额 × '+newK, newK*P.child]);
+
+  const sib = cnt('sib');
+  if(sib) A.push(['供养兄弟姊妹 × '+sib, sib*P.sibling]);
+
+  const p60=cnt('p60'), p60l=Math.min(cnt('p60l'),p60);
+  const p55=cnt('p55'), p55l=Math.min(cnt('p55l'),p55);
+  if(p60)  A.push(['供养父母/祖父母(60岁+)× '+p60, p60*P.par60]);
+  if(p60l) A.push(['  同住额外免税额 × '+p60l, p60l*P.par60]);
+  if(p55)  A.push(['供养父母/祖父母(55–59岁)× '+p55, p55*P.par55]);
+  if(p55l) A.push(['  同住额外免税额 × '+p55l, p55l*P.par55]);
+
+  const dd = cnt('disDep');
+  if(dd) A.push(['伤残受养人 × '+dd, dd*P.disDep]);
+  const allow = A.reduce((s,r)=>s+r[1],0);
+
+  /* 扣除 */
+  const D = [];
+  const addD = (name, claimed, cap) => { if(claimed>0) D.push([name, claimed, cap, Math.min(claimed,cap)]); };
+  addD('强制性供款(强积金)', mpf, P.rrs);
+  if(hType) addD(hType==='hli' ? '居所贷款利息' : '住宅租金', num('hAmt'), $('hKid').checked ? P.housingKid : P.housing);
+  addD('年金保费 + 可扣税强积金自愿供款', num('annuity'), P.annuity);
+  const donCap = P.donPct * Math.max(0, income - exp);
+  addD('认可慈善捐款', num('donation'), donCap);
+  addD('个人进修开支', num('selfEdu'), P.selfEdu);
+  addD('长者住宿照顾开支', num('elderly'), P.elderly);
+  addD('自愿医保(VHIS)保费', num('vhis'), P.vhis * Math.max(1,cnt('vhisN')));
+  addD('辅助生育服务开支', num('art'), P.art);
+  const ded = D.reduce((s,r)=>s+r[3],0);
+
+  /* 税款 */
+  const net = Math.max(0, income - exp - ded);
+  const nci = Math.max(0, net - allow);
+  const prog = tiered(nci, BANDS);
+  const std  = tiered(net, STD);
+  const useStd = std.total < prog.total;
+  const taxBefore = Math.min(prog.total, std.total);
+  const rebate = Math.min(taxBefore, num('rebate'));
+  const tax = taxBefore - rebate;
+
+  let marginal = 0;
+  if(useStd) marginal = net >= 5000000 ? .16 : .15;
+  else if(nci > 0){ let acc=0; for(const [s,r] of BANDS){ acc+=s; marginal=r; if(nci<acc) break; } }
+
+  /* 输出 */
+  $('rTax').textContent = $('mTax').textContent = fmt(tax);
+  $('rMonth').textContent = fmt(tax/12);
+  $('rEff').textContent = income>0 ? pct(tax/income) : '0%';
+  $('rMar').textContent = pct(marginal);
+  $('method').textContent = useStd ? '标准税率较低' : '累进税率';
+  $('mpfHint').textContent = mpfAuto ? '已自动估算,取消勾选可手动修改' : '每年上限 $18,000';
+  $('donHint').textContent = '本年上限 ' + fmt(donCap) + '(入息的 35%)';
+
+  $('tCalc').innerHTML =
+    '<tr><td>全年应评税入息</td><td>'+fmt(income)+'</td></tr>'+
+    (exp ? '<tr><td>− 可扣除支出及折旧免税额</td><td>'+fmt(exp)+'</td></tr>' : '')+
+    '<tr><td>− 扣除总额</td><td>'+fmt(ded)+'</td></tr>'+
+    '<tr><td><b>= 入息净额</b></td><td><b>'+fmt(net)+'</b></td></tr>'+
+    '<tr><td>− 免税总额</td><td>'+fmt(allow)+'</td></tr>'+
+    '<tr><td><b>= 应课税入息实额</b></td><td><b>'+fmt(nci)+'</b></td></tr>'+
+    '<tr class="'+(!useStd?'win':'')+'"><td>① 累进税率税款</td><td>'+fmt(prog.total)+'</td></tr>'+
+    '<tr class="'+(useStd?'win':'')+'"><td>② 标准税率税款(入息净额)</td><td>'+fmt(std.total)+'</td></tr>'+
+    (rebate ? '<tr><td>− 税款宽减</td><td>'+fmt(rebate)+'</td></tr>' : '')+
+    '<tr class="total"><td>应缴税款(取较低者)</td><td>'+fmt(tax)+'</td></tr>';
+
+  $('tAllow').innerHTML = '<tr><th>项目</th><th>金额</th></tr>'+
+    A.map(r=>'<tr><td>'+r[0]+'</td><td>'+fmt(r[1])+'</td></tr>').join('')+
+    '<tr class="total"><td>免税总额</td><td>'+fmt(allow)+'</td></tr>';
+
+  $('tDed').innerHTML = D.length
+    ? '<tr><th>项目</th><th>申报</th><th>上限</th><th>获准</th></tr>'+
+      D.map(r=>'<tr><td>'+r[0]+'</td><td>'+fmt(r[1])+'</td><td>'+fmt(r[2])+'</td><td>'+fmt(r[3])+'</td></tr>').join('')+
+      '<tr class="total"><td colspan="3">扣除总额</td><td>'+fmt(ded)+'</td></tr>'
+    : '<tr><td style="text-align:center;color:#999">暂无扣除项目</td></tr>';
+
+  const names = ['首 $50,000','次 $50,000','次 $50,000','次 $50,000','余额'];
+  $('tBand').innerHTML = '<tr><th>级别</th><th>金额</th><th>税率</th><th>税款</th></tr>'+
+    (prog.rows.length
+      ? prog.rows.map((r,i)=>'<tr><td>'+names[i]+'</td><td>'+fmt(r.part)+'</td><td>'+pct(r.rate)+'</td><td>'+fmt(r.tax)+'</td></tr>').join('')
+      : '<tr><td colspan="4" style="text-align:center;color:#999">应课税入息实额为 $0</td></tr>')+
+    '<tr class="total"><td colspan="3">合计</td><td>'+fmt(prog.total)+'</td></tr>';
+
+  save();
+}
+
+/* ===== 记忆输入 ===== */
+const KEY = 'hktax2627';
+const fields = () => [...document.querySelectorAll('input,select')];
+function save(){
+  try{
+    const o = {}; fields().forEach(e => o[e.id] = e.type==='checkbox' ? e.checked : e.value);
+    localStorage.setItem(KEY, JSON.stringify(o));
+  }catch(e){}
+}
+function load(){
+  try{
+    const o = JSON.parse(localStorage.getItem(KEY)||'null'); if(!o) return;
+    fields().forEach(e => { if(e.id in o){ if(e.type==='checkbox') e.checked=o[e.id]; else e.value=o[e.id]; } });
+  }catch(e){}
+}
+
+document.querySelectorAll('input[type=number]').forEach(e => e.setAttribute('inputmode','decimal'));
+fields().forEach(e => { e.addEventListener('input',calc); e.addEventListener('change',calc); });
+
+$('reset').addEventListener('click',()=>{
+  try{localStorage.removeItem(KEY);}catch(e){}
+  fields().forEach(e=>{
+    if(e.type==='checkbox') e.checked = e.id==='mpfAuto';
+    else if(e.tagName==='SELECT') e.selectedIndex = e.id==='incUnit' ? 1 : 0;
+    else e.value = e.id==='income' ? 600000 : e.id==='vhisN' ? 1 : 0;
+  });
+  calc();
+});
+
+$('mbar').addEventListener('click',()=>{ $('result').scrollIntoView({behavior:'smooth',block:'start'}); });
+
+/* ===== 打印:仅结果区 ===== */
+let _open = null;
+function beforePrint(){
+  if(_open) return;
+  const ds = [...document.querySelectorAll('#result details')];
+  _open = ds.map(d=>d.open);
+  ds.forEach(d=>d.open = true);
+  $('pDate').textContent = new Date().toLocaleDateString('zh-HK',{year:'numeric',month:'long',day:'numeric'});
+}
+function afterPrint(){
+  if(!_open) return;
+  [...document.querySelectorAll('#result details')].forEach((d,i)=>d.open=_open[i]);
+  _open = null;
+}
+window.addEventListener('beforeprint',beforePrint);
+window.addEventListener('afterprint',afterPrint);
+$('print').addEventListener('click',()=>{ beforePrint(); window.print(); });
+
+load(); calc();
+</script>
+
+
+</body></html>
